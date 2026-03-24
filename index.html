@@ -21,14 +21,16 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--ios-bg);
+            background: linear-gradient(to bottom right, #F0F4F8, #D9E2EC);
         }
         
-        /* Enhanced Card Style - Deeper Shadow, Cleaner Edges */
+        /* Enhanced Card Style - Glassmorphism */
         .ios-card {
-            background-color: white;
-            border-radius: 16px; /* Slightly larger radius */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* More noticeable but soft shadow */
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             padding: 24px;
         }
         
@@ -98,36 +100,15 @@
         #main-app {
             min-height: 100vh;
         }
-        .sidebar {
-            width: 280px; /* Slightly wider sidebar */
-            min-width: 280px;
-        }
-        
-        /* Calendar pill styles */
-        .calendar-pill {
-            display: flex;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 9999px;
-            padding: 2px 8px;
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
 
         /* Responsive adjustments for mobile view */
+        @media (max-width: 768px) {
+            .mobile-hidden {
+                display: none;
+            }
+        }
+
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: static;
-                border-bottom: 1px solid #D1D1D6;
-            }
-            #main-app {
-                flex-direction: column;
-            }
             .app-section {
                 padding: 16px;
             }
@@ -159,38 +140,44 @@
         </div>
 
         <!-- Main Application Screen -->
-        <div id="main-app" class="hidden flex lg:flex-row flex-col">
-            <!-- Sidebar Navigation -->
-            <div class="sidebar bg-white border-r border-gray-200 p-6 lg:sticky top-0 h-auto lg:h-screen overflow-y-auto">
-                <h1 class="text-3xl font-extrabold mb-10 text-center text-gray-900">CoupleTrack</h1>
-
-                <nav class="space-y-2">
-                    <button data-section="tracker" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600 ios-tab-active">
-                        <i data-lucide="wallet" class="w-5 h-5 mr-3"></i>
-                        <span class="text-left flex-1">Tracker</span>
-                    </button>
-                    <button data-section="reports" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>
-                        <span class="text-left flex-1">Reports</span>
-                    </button>
-                    <button data-section="calendar" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600">
-                        <i data-lucide="calendar-check" class="w-5 h-5 mr-3"></i>
-                        <span class="text-left flex-1">Calendar</span>
-                    </button>
-                    <button data-section="settings" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600">
-                        <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
-                        <span class="text-left flex-1">Settings</span>
-                    </button>
-                </nav>
-
-                <div class="mt-12 pt-6 border-t border-gray-200">
-                    <div id="user-info" class="text-sm text-gray-500 mb-4 truncate"></div>
-                    <button id="logout-button" class="ios-button w-full bg-red-500 hover:bg-red-600 text-sm flex items-center justify-center">
-                        <i data-lucide="log-out" class="w-4 h-4 inline mr-2"></i>
-                        Sign Out
-                    </button>
+        <div id="main-app" class="hidden flex flex-col">
+            <!-- Header -->
+            <header class="bg-white/70 backdrop-blur-md shadow-md sticky top-0 z-10">
+                <div class="container mx-auto px-4">
+                    <div class="flex justify-between items-center py-4">
+                        <h1 class="text-2xl font-extrabold text-gray-900">CoupleTrack</h1>
+                        <!-- Desktop Navigation -->
+                        <nav class="hidden lg:flex space-x-2">
+                            <button data-section="tracker" class="nav-button px-4 py-2 rounded-lg transition-colors text-gray-600 ios-tab-active">Tracker</button>
+                            <button data-section="reports" class="nav-button px-4 py-2 rounded-lg transition-colors text-gray-600">Reports</button>
+                            <button data-section="calendar" class="nav-button px-4 py-2 rounded-lg transition-colors text-gray-600">Calendar</button>
+                            <button data-section="settings" class="nav-button px-4 py-2 rounded-lg transition-colors text-gray-600">Settings</button>
+                        </nav>
+                        <!-- Mobile Navigation Button -->
+                        <div class="lg:hidden">
+                            <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900">
+                                <i data-lucide="menu" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="hidden lg:hidden">
+                    <nav class="flex flex-col p-4 space-y-2">
+                        <button data-section="tracker" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600 ios-tab-active">Tracker</button>
+                        <button data-section="reports" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600">Reports</button>
+                        <button data-section="calendar" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600">Calendar</button>
+                        <button data-section="settings" class="nav-button w-full flex items-center p-3 rounded-xl transition-colors text-gray-600">Settings</button>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div id="user-info" class="text-sm text-gray-500 mb-4 truncate"></div>
+                            <button id="logout-button" class="ios-button w-full bg-red-500 hover:bg-red-600 text-sm flex items-center justify-center">
+                                <i data-lucide="log-out" class="w-4 h-4 inline mr-2"></i>
+                                Sign Out
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+            </header>
 
             <!-- Content Area -->
             <main class="flex-1 p-6 lg:p-10 overflow-y-auto">
@@ -206,7 +193,7 @@
                     <!-- New Transaction Form -->
                     <div class="ios-card mb-10">
                         <h3 class="text-2xl font-bold mb-6 border-b pb-3 text-gray-800">Log New Transaction</h3>
-                        <form id="expense-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <form id="expense-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             
                             <div class="lg:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Particulars / Description</label>
@@ -262,7 +249,7 @@
                                 </select>
                             </div>
 
-                            <button type="submit" class="ios-button lg:col-span-4 mt-4 flex items-center justify-center">
+                            <button type="submit" class="ios-button lg:col-span-3 mt-4 flex items-center justify-center">
                                 <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
                                 Add Transaction
                             </button>
@@ -290,7 +277,7 @@
                         
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead>
+                                <thead class="mobile-hidden">
                                     <tr>
                                         <th class="table-header w-20">Date</th>
                                         <th class="table-header">Particular</th>
@@ -302,10 +289,15 @@
                                         <th class="table-header w-24 text-center">Delete</th>
                                     </tr>
                                 </thead>
-                                <tbody id="transactions-table-body" class="bg-white divide-y divide-gray-100">
+                                <tbody id="transactions-table-body" class="bg-white divide-y divide-gray-100 md:divide-y-0">
                                     <!-- Transactions rows will be injected here -->
                                 </tbody>
                             </table>
+                        </div>
+                        <div id="pagination-controls" class="p-4 flex justify-between items-center">
+                            <button id="prev-page" class="ios-button">Back</button>
+                            <span id="page-info"></span>
+                            <button id="next-page" class="ios-button">Next</button>
                         </div>
                     </div>
                 </section>
@@ -324,9 +316,13 @@
                                 Run Report
                             </button>
                         </div>
-                        <button id="print-report-button" class="ios-button bg-gray-500 hover:bg-gray-600 flex items-center justify-center md:w-40">
+                        <button id="print-report-button" class="ios-button bg-gray-500 hover:bg-gray-600 flex items-center justify-center md:w-auto">
                             <i data-lucide="printer" class="w-5 h-5 mr-2"></i>
                             Print
+                        </button>
+                        <button id="download-csv-button" class="ios-button bg-green-500 hover:bg-green-600 flex items-center justify-center md:w-auto">
+                            <i data-lucide="download" class="w-5 h-5 mr-2"></i>
+                            Download CSV
                         </button>
                     </div>
 
@@ -352,13 +348,18 @@
                             <div id="reports-transactions-table" class="overflow-x-auto">
                                 <p class="text-gray-500 p-6">Filtered transaction details will appear here.</p>
                             </div>
+                            <div id="report-pagination-controls" class="p-4 flex justify-between items-center">
+                                <button id="report-prev-page" class="ios-button">Back</button>
+                                <span id="report-page-info"></span>
+                                <button id="report-next-page" class="ios-button">Next</button>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Calendar Section -->
                 <section id="calendar-section" class="app-section hidden">
-                    <h2 class="text-4xl font-extrabold mb-8 text-gray-900">Financial Calendar</h2>
+                    <h2 class="text-4xl font-extrabold mb-8 text-gray-900">Upcoming Expenses & Calendar</h2>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="ios-card lg:col-span-2 p-0">
@@ -398,8 +399,8 @@
                             </form>
 
                             <div class="mt-8 pt-6 border-t">
-                                <h4 class="text-xl font-bold mb-3 text-gray-800">Scheduled Items List</h4>
-                                <ul id="upcoming-list" class="space-y-3 max-h-60 overflow-y-auto">
+                                <h4 class="text-xl font-bold mb-3 text-gray-800">Scheduled Items</h4>
+                                <ul id="upcoming-list" class="space-y-3 h-64 overflow-y-auto">
                                     <!-- Upcoming items list injected here -->
                                 </ul>
                             </div>
@@ -417,14 +418,14 @@
                         <div class="ios-card lg:col-span-2">
                             <h3 class="text-2xl font-bold mb-4 border-b pb-3 text-gray-800">Partners & Expense Division</h3>
                             <form id="partner-settings-form" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Partner A Name</label>
                                         <input type="text" id="partner-a-name" placeholder="Partner A Name" class="ios-input w-full" required>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Partner A Monthly Income (₱)</label>
-                                        <input type="number" id="partner-a-income" placeholder="0" class="ios-input w-full" required min="0">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Partner A Current Balance (₱)</label>
+                                        <input type="number" id="partner-a-income" placeholder="0" class="ios-input w-full" required min="0" step="0.01">
                                     </div>
 
                                     <div>
@@ -432,8 +433,8 @@
                                         <input type="text" id="partner-b-name" placeholder="Partner B Name" class="ios-input w-full" required>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Partner B Monthly Income (₱)</label>
-                                        <input type="number" id="partner-b-income" placeholder="0" class="ios-input w-full" required min="0">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Partner B Current Balance (₱)</label>
+                                        <input type="number" id="partner-b-income" placeholder="0" class="ios-input w-full" required min="0" step="0.01">
                                     </div>
                                 </div>
 
@@ -493,7 +494,7 @@
 
                             <div class="mt-6 pt-6 border-t">
                                 <h4 class="text-xl font-bold mb-3 text-gray-800">Current Custom Items</h4>
-                                <ul id="custom-items-list" class="space-y-3 text-sm">
+                                <ul id="custom-items-list" class="space-y-3 text-sm h-64 overflow-y-auto">
                                     <!-- Custom items injected here -->
                                 </ul>
                             </div>
@@ -588,12 +589,21 @@
             upcoming: [],
             currentView: "tracker",
             filteredTransactions: [],
+            reportTransactions: [],
+            currentPage: 1,
+            reportCurrentPage: 1,
         };
+
+        const transactionsPerPage = 20;
 
         // --- UTILITY FUNCTIONS ---
 
         const formatCurrency = (amount) => {
-            return `₱ ${Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            return `₱ ${Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        };
+
+        const getTodayDateString = () => {
+            return new Date().toISOString().split('T')[0];
         };
 
         const showMessageModal = (title, message, isConfirm = false, onConfirm = () => {}) => {
@@ -606,18 +616,14 @@
             if (isConfirm) {
                 confirmBtn.classList.remove('hidden');
                 cancelBtn.classList.remove('hidden');
-                cancelBtn.textContent = 'Cancel'; // Ensure cancel button text is correct
-                cancelBtn.classList.add('bg-gray-400', 'hover:bg-gray-500');
-                cancelBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-                
                 confirmBtn.onclick = () => { onConfirm(); modal.classList.add('hidden'); };
                 cancelBtn.onclick = () => { modal.classList.add('hidden'); };
             } else {
                 confirmBtn.classList.add('hidden');
                 cancelBtn.classList.remove('hidden');
                 cancelBtn.textContent = 'Close';
+                cancelBtn.classList.remove('bg-gray-400');
                 cancelBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-                cancelBtn.classList.remove('bg-gray-400', 'hover:bg-gray-500');
                 cancelBtn.onclick = () => { modal.classList.add('hidden'); };
             }
 
@@ -635,9 +641,10 @@
             let share = 0.5; // Default 50/50
 
             if (divisionMethod === "Proportional") {
-                const totalIncome = incomeA + incomeB;
-                if (totalIncome > 0) {
-                    share = isPartnerA ? (incomeA / totalIncome) : (incomeB / totalIncome);
+                // Now using dynamic balances (incomeA/incomeB) as the basis
+                const totalBalance = incomeA + incomeB;
+                if (totalBalance > 0) {
+                    share = isPartnerA ? (incomeA / totalBalance) : (incomeB / totalBalance);
                 }
             } else if (divisionMethod === "Custom") {
                 share = isPartnerA ? (customA / 100) : (customB / 100);
@@ -646,15 +653,26 @@
         };
 
         /**
-         * Calculates the debt adjustment for a single shared expense transaction.
+         * Calculates the debt adjustment for a single shared expense or debt payment transaction.
          * Debt is relative to Partner B owing Partner A.
          * Positive result means B owes A. Negative means A owes B.
-         * @param {number} amount - The total expense amount.
+         * @param {number} amount - The transaction amount.
          * @param {string} whoPaid - The name of the partner who paid.
+         * @param {string} debtType - "Shared" or "DebtPayment".
          * @returns {number} The change in debt.
          */
-        const calculateDebtAdjustment = (amount, whoPaid) => {
+        const calculateDebtAdjustment = (amount, whoPaid, debtType = "Shared") => {
             const isPartnerAPaid = whoPaid === appState.settings.partnerA;
+
+            if (debtType === "DebtPayment") {
+                // For debt payments, the person who paid is reducing their debt 
+                // or increasing the other's debt to them.
+                // If A paid B, B owes A more (Positive debt for B)
+                // If B paid A, B owes A less (Negative debt for B)
+                return isPartnerAPaid ? amount : -amount;
+            }
+
+            // --- Shared Expense Logic ---
             const partnerAShare = getPartnerShare(true);
 
             // A's target share is what A should have paid.
@@ -701,34 +719,72 @@
                     date: Timestamp.fromDate(new Date(data.date))
                 });
 
-                // Update total debt if it was a shared expense
-                if (data.debtType === "Shared" && data.type === "Expense") {
-                    const adjustment = calculateDebtAdjustment(data.amount, data.whoPaid);
+                const isPartnerA = data.whoPaid === appState.settings.partnerA;
+                const balanceKey = isPartnerA ? 'incomeA' : 'incomeB';
+
+                // 1. Update total debt if it was a shared expense or debt payment
+                if ((data.debtType === "Shared" && data.type === "Expense") || data.debtType === "DebtPayment") {
+                    const adjustment = calculateDebtAdjustment(data.amount, data.whoPaid, data.debtType);
+                    // Use Number.parseFloat and toFixed to avoid floating point precision issues
+                    const newDebt = parseFloat((appState.settings.currentDebt + adjustment).toFixed(2));
                     await updateDoc(doc(db, getSettingsPath()), {
-                        currentDebt: appState.settings.currentDebt + adjustment
+                        currentDebt: newDebt
                     });
-                } else if (data.debtType === "DebtPayment") {
-                     // We simplified: only update debt on reconciliation, DebtPayment is just a log of money transfer.
+                }
+
+                // 2. Dynamic Income/Balance Logic
+                if (data.type === "Expense") {
+                    // Deduct from partner balance for ALL expense types (Regardless if it is personal, debt, or shared)
+                    const newBalance = parseFloat((appState.settings[balanceKey] - data.amount).toFixed(2));
+                    await updateDoc(doc(db, getSettingsPath()), {
+                        [balanceKey]: newBalance
+                    });
+                } else if (data.type === "Income") {
+                    // Add to partner balance for income
+                    const newBalance = parseFloat((appState.settings[balanceKey] + data.amount).toFixed(2));
+                    await updateDoc(doc(db, getSettingsPath()), {
+                        [balanceKey]: newBalance
+                    });
                 }
 
                 document.getElementById('expense-form').reset();
+                document.getElementById('expense-date').value = getTodayDateString();
             } catch (e) {
                 console.error("Error adding transaction: ", e);
                 showMessageModal("Error", "Failed to add transaction.");
             }
         };
 
-        const deleteTransaction = async (id, isSharedExpense, amount, whoPaid, type) => {
+        const deleteTransaction = async (id, debtType, amount, whoPaid, type) => {
             if (!userId) return;
             try {
                 await deleteDoc(doc(getTransactionsColRef(), id));
 
-                // Recalculate debt only if it was a shared expense/income
-                if (isSharedExpense && type === "Expense") {
-                    const adjustment = calculateDebtAdjustment(amount, whoPaid);
+                const isPartnerA = whoPaid === appState.settings.partnerA;
+                const balanceKey = isPartnerA ? 'incomeA' : 'incomeB';
+
+                // 1. Recalculate debt only if it was a shared expense or debt payment
+                if ((debtType === "Shared" && type === "Expense") || debtType === "DebtPayment") {
+                    const adjustment = calculateDebtAdjustment(amount, whoPaid, debtType);
                     // Deleting the transaction reverses the debt adjustment
+                    const newDebt = parseFloat((appState.settings.currentDebt - adjustment).toFixed(2));
                     await updateDoc(doc(db, getSettingsPath()), {
-                        currentDebt: appState.settings.currentDebt - adjustment
+                        currentDebt: newDebt
+                    });
+                }
+
+                // 2. Reverse Dynamic Balance Logic
+                if (type === "Expense") {
+                    // Restore partner balance for ALL expense types
+                    const newBalance = parseFloat((appState.settings[balanceKey] + amount).toFixed(2));
+                    await updateDoc(doc(db, getSettingsPath()), {
+                        [balanceKey]: newBalance
+                    });
+                } else if (type === "Income") {
+                    // Deduct from partner balance for deleted income
+                    const newBalance = parseFloat((appState.settings[balanceKey] - amount).toFixed(2));
+                    await updateDoc(doc(db, getSettingsPath()), {
+                        [balanceKey]: newBalance
                     });
                 }
             } catch (e) {
@@ -846,16 +902,13 @@
 
             // 4. Render Settings
             renderSettings();
-            
-            // 5. Render Upcoming List (always, as it's part of calendar page)
-            renderUpcomingList();
 
-            // 6. Render Calendar (if in view)
+            // 5. Render Calendar (if in view)
             if (appState.currentView === 'calendar') {
                 renderCalendar();
             }
 
-            // 7. Update User Info
+            // 6. Update User Info
             document.getElementById('user-info').textContent = `User ID: ${userId.slice(0, 8)}...`; // Show truncated ID
 
             // Re-render lucide icons
@@ -868,7 +921,7 @@
             let debtStatusText = '';
             let subStatusText = '';
 
-            if (currentDebt === 0) {
+            if (Math.abs(currentDebt) < 0.01) {
                 debtStatusText = `All settled up!`;
                 subStatusText = "Congratulations, you are balanced!";
             } else if (currentDebt > 0) {
@@ -887,28 +940,41 @@
                       <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
                       Reconcile Balance
                    </button>`
-                : '<div class="h-10 mt-4"></div>'; // Placeholder space
+                : '<div class="h-10"></div>'; // Placeholder space
 
             document.getElementById('current-balance-summary').innerHTML = `
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>
                         <h4 class="text-lg font-semibold text-gray-700">${debtStatusText}</h4>
-                        <p class="text-4xl font-extrabold ${currentDebt === 0 ? 'text-gray-900' : 'peso-color-debt'} mt-1">${debtAmount}</p>
+                        <p class="text-4xl md:text-5xl font-extrabold ${currentDebt === 0 ? 'text-gray-900' : 'peso-color-debt'} mt-1">${debtAmount}</p>
                         <p class="text-sm text-gray-500 mt-1">${subStatusText}</p>
                     </div>
-                    ${reconcileButton}
+                    <div class="mt-4 md:mt-0">
+                        ${reconcileButton}
+                    </div>
                 </div>
             `;
             // Re-render icons after injection
             lucide.createIcons();
             // Attach event listener for reconciliation
-            if (currentDebt !== 0) {
+            if (Math.abs(currentDebt) >= 0.01) {
                 document.getElementById('reconcile-button').onclick = () => showMessageModal(
                     "Reconcile Debt",
-                    `Are you sure you want to zero out the current debt of <strong>${debtAmount}</strong>? This assumes the payment has been settled.`,
+                    `Are you sure you want to zero out the current debt of <strong>${debtAmount}</strong>? This will create a 'Debt Payment' transaction to balance the records.`,
                     true,
                     async () => {
-                        await saveSettings({ currentDebt: 0 });
+                        // Create a balancing DebtPayment transaction
+                        const data = {
+                            date: new Date().toISOString().split('T')[0],
+                            amount: Math.abs(currentDebt),
+                            type: "Expense", // It's a payment, but let's label it for the form
+                            category: "Reconciliation",
+                            particular: `Debt Reconciliation (${currentDebt > 0 ? partnerB : partnerA} settled debt)`,
+                            whoPaid: currentDebt > 0 ? partnerB : partnerA,
+                            debtType: "DebtPayment",
+                            account: "Reconciliation",
+                        };
+                        await addTransaction(data);
                         showMessageModal("Success", "Debt balance reconciled to zero.");
                     }
                 );
@@ -920,12 +986,16 @@
             const tableBody = document.getElementById('transactions-table-body');
             tableBody.innerHTML = ''; // Clear previous rows
 
+            const startIndex = (appState.currentPage - 1) * transactionsPerPage;
+            const endIndex = startIndex + transactionsPerPage;
+            const paginatedTransactions = transactions.slice(startIndex, endIndex);
+
             if (transactions.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-500">No transactions logged yet.</td></tr>';
                 return;
             }
 
-            transactions.forEach((t, index) => {
+            paginatedTransactions.forEach((t, index) => {
                 const isExpense = t.type === 'Expense';
                 const colorClass = isExpense ? 'peso-color-expense' : 'peso-color-income';
                 const debtInfo = t.debtType === 'Shared' && isExpense
@@ -933,18 +1003,18 @@
                     : 'N/A';
 
                 const row = document.createElement('tr');
-                row.className = `table-row-hover table-row-zebra`;
+                row.className = `table-row-hover table-row-zebra flex flex-col md:table-row p-4 md:p-0 border-b md:border-b-0`;
                 row.innerHTML = `
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${new Date(t.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                    <td class="px-4 py-3 font-medium text-gray-800">${t.particular}</td>
-                    <td class="px-4 py-3 text-sm font-semibold">${t.type}</td>
-                    <td class="px-4 py-3 font-bold ${colorClass} text-right">${formatCurrency(t.amount)}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600">${t.whoPaid}</td>
-                    <td class="px-4 py-3 text-sm">${t.category}</td>
-                    <td class="px-4 py-3 text-sm text-center text-gray-700">${debtInfo}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-medium">
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 md:table-cell"><span class="font-bold md:hidden">Date: </span>${new Date(t.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                    <td class="px-4 py-3 font-medium text-gray-800 md:table-cell"><span class="font-bold md:hidden">Particulars: </span>${t.particular}</td>
+                    <td class="px-4 py-3 text-sm font-semibold md:table-cell"><span class="font-bold md:hidden">Type: </span>${t.type}</td>
+                    <td class="px-4 py-3 font-bold ${colorClass} text-right md:table-cell"><span class="font-bold md:hidden">Amount: </span>${formatCurrency(t.amount)}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 md:table-cell"><span class="font-bold md:hidden">Who Paid: </span>${t.whoPaid}</td>
+                    <td class="px-4 py-3 text-sm md:table-cell"><span class="font-bold md:hidden">Category: </span>${t.category}</td>
+                    <td class="px-4 py-3 text-sm text-center md:table-cell"><span class="font-bold md:hidden">Debt: </span>${debtInfo}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-medium md:table-cell">
                         <button class="text-red-600 hover:text-red-900 delete-btn p-1 rounded-full hover:bg-red-100 transition-colors" data-id="${t.id}"
-                                data-shared="${t.debtType === 'Shared'}"
+                                data-debt-type="${t.debtType}"
                                 data-amount="${t.amount}"
                                 data-paid="${t.whoPaid}"
                                 data-type="${t.type}">
@@ -958,6 +1028,12 @@
             // Re-render icons
             lucide.createIcons();
 
+            // Update Pagination
+            const totalPages = Math.ceil(transactions.length / transactionsPerPage);
+            document.getElementById('page-info').textContent = `Page ${appState.currentPage} of ${totalPages}`;
+            document.getElementById('prev-page').disabled = appState.currentPage === 1;
+            document.getElementById('next-page').disabled = appState.currentPage === totalPages;
+
             // Attach delete listeners
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = () => showMessageModal(
@@ -966,7 +1042,7 @@
                     true,
                     () => deleteTransaction(
                         btn.dataset.id,
-                        btn.dataset.shared === 'true',
+                        btn.dataset.debtType,
                         parseFloat(btn.dataset.amount),
                         btn.dataset.paid,
                         btn.dataset.type
@@ -993,7 +1069,6 @@
                 }
                 if (dateStart) {
                     const start = new Date(dateStart);
-                    start.setHours(0, 0, 0, 0); // Start of the day
                     if (tDate.getTime() < start.getTime()) pass = false;
                 }
                 if (dateEnd) {
@@ -1050,9 +1125,6 @@
                 const title = type.charAt(0).toUpperCase() + type.slice(1) + 's';
                 const items = appState.accounts[type] || [];
                 customList.innerHTML += `<li class="font-bold text-gray-800 mt-4 border-b border-blue-100 pb-1">${title}</li>`;
-                if (items.length === 0) {
-                     customList.innerHTML += `<li class="text-gray-400 text-sm italic py-1">No ${type} items added.</li>`;
-                }
                 items.forEach(item => {
                     customList.innerHTML += `
                         <li class="flex justify-between items-center text-gray-700 py-2 border-b border-gray-100 last:border-b-0">
@@ -1080,7 +1152,9 @@
         };
 
         // --- REPORT GENERATION ---
-        const generateReport = () => {
+        const generateReport = (resetPage = false) => {
+            if (resetPage) appState.reportCurrentPage = 1;
+
             const transactions = appState.transactions;
             const startDateStr = document.getElementById('report-date-start').value;
             const endDateStr = document.getElementById('report-date-end').value;
@@ -1088,10 +1162,9 @@
             const partnerAShare = getPartnerShare(true);
 
             const startDate = startDateStr ? new Date(startDateStr) : new Date(0);
-            if (startDateStr) startDate.setHours(0, 0, 0, 0); // Start of day
-            
             const endDate = endDateStr ? new Date(endDateStr) : new Date();
-            if (endDateStr) endDate.setHours(23, 59, 59, 999); // End of day
+            // Adjust endDate to include the whole day
+            if (endDateStr) endDate.setHours(23, 59, 59, 999);
 
             let reportTransactions = transactions.filter(t => {
                 const tDate = new Date(t.date.seconds * 1000);
@@ -1099,13 +1172,23 @@
             });
             
             reportTransactions.sort((a, b) => b.date.seconds - a.date.seconds);
+            appState.reportTransactions = reportTransactions;
 
             // 1. Settlement Summary Calculation
+            // Find the index of the most recent reconciliation transaction in this range
+            const lastReconIndex = reportTransactions.findIndex(t => t.category === 'Reconciliation');
+            
+            // Only calculate metrics for transactions AFTER (newer than) the latest reconciliation
+            const activeTransactions = lastReconIndex !== -1 
+                ? reportTransactions.slice(0, lastReconIndex) 
+                : reportTransactions;
+
             let totalSharedExpense = 0;
             let totalPaidA = 0;
             let totalPaidB = 0;
+            let netAdjustment = 0;
 
-            reportTransactions.forEach(t => {
+            activeTransactions.forEach(t => {
                 const tAmount = parseFloat(t.amount);
                 if (t.type === 'Expense' && t.debtType === 'Shared') {
                     totalSharedExpense += tAmount;
@@ -1114,33 +1197,38 @@
                     } else if (t.whoPaid === partnerB) {
                         totalPaidB += tAmount;
                     }
+                    netAdjustment += calculateDebtAdjustment(tAmount, t.whoPaid, "Shared");
+                } else if (t.debtType === 'DebtPayment') {
+                    netAdjustment += calculateDebtAdjustment(tAmount, t.whoPaid, "DebtPayment");
                 }
             });
 
             const expectedShareA = totalSharedExpense * partnerAShare;
             const expectedShareB = totalSharedExpense * (1 - partnerAShare);
 
-            // If A paid more than their share, B owes A (positive debt).
-            const netDebt = totalPaidA - expectedShareA; 
-
             let settlementText = '';
             let settlementColor = 'text-gray-800';
 
-            if (netDebt > 0) {
-                settlementText = `${partnerB} needs to pay ${partnerA} <strong>${formatCurrency(netDebt)}</strong> to balance shared expenses.`;
-                settlementColor = 'text-red-600';
-            } else if (netDebt < 0) {
-                settlementText = `${partnerA} needs to pay ${partnerB} <strong>${formatCurrency(netDebt)}</strong> to balance shared expenses.`;
+            if (Math.abs(netAdjustment) < 0.01) {
+                settlementText = "Shared expenses are perfectly balanced!";
+                settlementColor = 'text-green-600';
+            } else if (netAdjustment > 0) {
+                settlementText = `${partnerB} owes ${partnerA} <strong>${formatCurrency(netAdjustment)}</strong> from transactions since last reconciliation.`;
                 settlementColor = 'text-red-600';
             } else {
-                settlementText = "Shared expenses are perfectly balanced in this period!";
-                settlementColor = 'text-green-600';
+                settlementText = `${partnerA} owes ${partnerB} <strong>${formatCurrency(netAdjustment)}</strong> from transactions since last reconciliation.`;
+                settlementColor = 'text-red-600';
             }
 
             const divisionRatio = (partnerAShare * 100).toFixed(0) + '/' + ((1 - partnerAShare) * 100).toFixed(0);
 
+            const reconStatusBadge = lastReconIndex !== -1 
+                ? `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2 inline-block">Reset since last reconciliation</span>`
+                : '';
+
             let summaryHTML = `
                 <div class="space-y-4 text-gray-700">
+                    ${reconStatusBadge}
                     <p><strong>Division Method:</strong> ${appState.settings.divisionMethod} (${divisionRatio} Split)</p>
                     <p><strong>Total Shared Expenses:</strong> <span class="font-bold text-gray-900">${formatCurrency(totalSharedExpense)}</span></p>
                     <hr class="border-gray-100">
@@ -1156,10 +1244,15 @@
                             <p class="text-sm text-gray-500">Expected: ${formatCurrency(expectedShareB)}</p>
                         </div>
                     </div>
-                    <p class="text-lg mt-4 pt-4 border-t font-semibold ${settlementColor}">
-                        <i data-lucide="${netDebt === 0 ? 'award' : 'alert-triangle'}" class="w-5 h-5 inline mr-2"></i>
-                        ${settlementText}
-                    </p>
+                    <div class="mt-4 pt-4 border-t">
+                        <p class="text-lg font-semibold ${settlementColor}">
+                            <i data-lucide="${Math.abs(netAdjustment) < 0.01 ? 'award' : 'alert-triangle'}" class="w-5 h-5 inline mr-2"></i>
+                            ${settlementText}
+                        </p>
+                        <p class="text-sm text-gray-500 mt-2">
+                            <strong>Current Overall Balance:</strong> ${formatCurrency(appState.settings.currentDebt)}
+                        </p>
+                    </div>
                 </div>
             `;
             document.getElementById('settlement-summary').innerHTML = summaryHTML;
@@ -1201,7 +1294,36 @@
             lucide.createIcons();
         };
 
+        const downloadCSV = (transactions) => {
+            const headers = ['Date', 'Particular', 'Type', 'Amount', 'Who Paid', 'Category', 'Debt Type'];
+            const rows = transactions.map(t => {
+                return [
+                    new Date(t.date.seconds * 1000).toLocaleDateString(),
+                    `"${t.particular}"`,
+                    t.type,
+                    t.amount,
+                    t.whoPaid,
+                    t.category,
+                    t.debtType
+                ].join(',');
+            });
+
+            const csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + "\n" + rows.join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "transactions.csv");
+            document.body.appendChild(link); // Required for FF
+
+            link.click();
+            document.body.removeChild(link);
+        }
+
         const renderReportTransactionsTable = (transactions) => {
+            const startIndex = (appState.reportCurrentPage - 1) * transactionsPerPage;
+            const endIndex = startIndex + transactionsPerPage;
+            const paginatedTransactions = transactions.slice(startIndex, endIndex);
+
             let tableHTML = `
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
@@ -1217,10 +1339,10 @@
                     <tbody class="bg-white divide-y divide-gray-100">
             `;
 
-            if (transactions.length === 0) {
+            if (paginatedTransactions.length === 0) {
                 tableHTML += '<tr><td colspan="6" class="text-center py-6 text-gray-500">No transactions match the filter range.</td></tr>';
             } else {
-                transactions.forEach(t => {
+                paginatedTransactions.forEach(t => {
                     const colorClass = t.type === 'Expense' ? 'peso-color-expense' : 'peso-color-income';
                     tableHTML += `
                         <tr class="table-row-hover table-row-zebra">
@@ -1237,10 +1359,16 @@
 
             tableHTML += '</tbody></table>';
             document.getElementById('reports-transactions-table').innerHTML = tableHTML;
+
+            // Update Pagination
+            const totalPages = Math.ceil(transactions.length / transactionsPerPage);
+            document.getElementById('report-page-info').textContent = `Page ${appState.reportCurrentPage} of ${totalPages}`;
+            document.getElementById('report-prev-page').disabled = appState.reportCurrentPage === 1;
+            document.getElementById('report-next-page').disabled = appState.reportCurrentPage === totalPages;
         };
 
 
-        // --- CALENDAR RENDER (IMPROVED) ---
+        // --- CALENDAR RENDER ---
 
         let currentCalendarDate = new Date();
 
@@ -1278,86 +1406,54 @@
             while (displayDate.getMonth() === month) {
                 const day = displayDate.getDate();
                 const dayEl = document.createElement('div');
-                // Removed fixed h-24, let content define height
-                dayEl.className = 'p-2 min-h-24 border rounded-xl m-1 relative flex flex-col items-center cursor-pointer transition-all bg-white hover:shadow-md';
+                dayEl.className = 'p-2 h-24 border rounded-xl m-1 relative flex flex-col items-center cursor-pointer transition-all bg-white hover:shadow-md';
                 
                 // Highlight today's date
                 if (displayDate.toDateString() === today.toDateString()) {
                     dayEl.classList.add('bg-blue-100', 'border-blue-500', 'border-2');
                 }
 
-                dayEl.innerHTML = `<span class="text-base font-bold text-gray-800">${day}</span>`;
+                dayEl.innerHTML = `<span class="text-xl font-bold text-gray-800">${day}</span>`;
 
-                // --- NEW: Find Logged Transactions for this day ---
-                const loggedTransactions = appState.transactions.filter(t => {
-                    const tDate = new Date(t.date.seconds * 1000);
-                    return tDate.getDate() === day && tDate.getMonth() === month && tDate.getFullYear() === year;
-                });
-
-                // --- Find Upcoming Events for this day (Existing logic) ---
-                const upcomingEvents = appState.upcoming.filter(e => {
+                const eventsForDay = appState.upcoming.filter(e => {
                     const eDate = new Date(e.date.seconds * 1000);
                     // Check for exact date match
                     const isExactMatch = eDate.getDate() === day && eDate.getMonth() === month && eDate.getFullYear() === year;
                     // Check for recurring match: if recurring is true, the recurring day matches, and the current date is after the initial scheduled date
-                    const isRecurring = e.recurring && parseInt(e.recurringDay) === day && (displayDate.getTime() >= eDate.getTime());
+                    const isRecurring = e.recurring && parseInt(e.recurringDay) === day && (eDate.getTime() <= displayDate.getTime());
 
                     return isExactMatch || isRecurring;
                 });
 
-                if (loggedTransactions.length > 0 || upcomingEvents.length > 0) {
-                    const eventContainer = document.createElement('div');
-                    eventContainer.className = 'mt-1 space-y-1 w-full overflow-hidden flex flex-col items-start px-1';
+                if (eventsForDay.length > 0) {
+                    const iconContainer = document.createElement('div');
+                    iconContainer.className = 'mt-1 space-y-0.5 w-full overflow-hidden flex flex-col items-start px-1';
                     
-                    let pillCount = 0;
-                    const maxPills = 3;
-
-                    // 1. Display Upcoming Events (Amber)
-                    upcomingEvents.forEach(event => {
-                        if (pillCount >= maxPills) return;
-                        eventContainer.innerHTML += `
-                            <div class="calendar-pill bg-amber-100 text-amber-800" title="${event.particular} - ${formatCurrency(event.amount)}">
-                                <i data-lucide="calendar-clock" class="w-3 h-3 inline mr-1.5 flex-shrink-0"></i> ${event.particular}
-                            </div>
+                    // Show a maximum of 3 events/icons
+                    eventsForDay.slice(0, 3).forEach(event => {
+                        iconContainer.innerHTML += `
+                            <p class="text-xs font-semibold text-red-600 truncate w-full" title="${event.particular} - ${formatCurrency(event.amount)}">
+                                <i data-lucide="calendar-x" class="w-3 h-3 inline mr-1"></i> ${formatCurrency(event.amount)}
+                            </p>
                         `;
-                        pillCount++;
                     });
-
-                    // 2. Display Logged Transactions (Green/Red)
-                    loggedTransactions.forEach(t => {
-                        if (pillCount >= maxPills) return;
-                        const isExpense = t.type === 'Expense';
-                        const colorClass = isExpense ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
-                        const icon = isExpense ? 'arrow-down-right' : 'arrow-up-right';
-                        
-                        eventContainer.innerHTML += `
-                            <div class="calendar-pill ${colorClass}" title="${t.particular} - ${formatCurrency(t.amount)}">
-                                <i data-lucide="${icon}" class="w-3 h-3 inline mr-1.5 flex-shrink-0"></i> ${t.particular}
-                            </div>
-                        `;
-                        pillCount++;
-                    });
-
-
-                    if (upcomingEvents.length + loggedTransactions.length > maxPills) {
-                         eventContainer.innerHTML += `<p class="text-xs text-gray-500 px-1.5 mt-1">+ ${upcomingEvents.length + loggedTransactions.length - maxPills} more</p>`;
+                    if (eventsForDay.length > 3) {
+                         iconContainer.innerHTML += `<p class="text-xs text-gray-400">... ${eventsForDay.length - 3} more</p>`;
                     }
-                    
                     if (!dayEl.classList.contains('bg-blue-100')) {
-                        dayEl.classList.add('bg-gray-50'); // Highlight days with events
+                        dayEl.classList.add('bg-red-50'); // Highlight days with events
                     }
-                    // --- UPDATED: Pass both arrays to the modal ---
-                    dayEl.onclick = () => showDayEvents(day, month, year, upcomingEvents, loggedTransactions);
-                    dayEl.appendChild(eventContainer);
+                    dayEl.onclick = () => showDayEvents(day, month, year, eventsForDay);
+                    dayEl.appendChild(iconContainer);
                 }
 
                 grid.appendChild(dayEl);
                 displayDate.setDate(displayDate.getDate() + 1);
             }
 
-            // Fill trailing empty cells (no change)
-            let lastDayIndex = (displayDate.getDay() - 1 + 7) % 7;
-            if (lastDayIndex !== 6) { 
+            // Fill trailing empty cells
+            let lastDayIndex = (displayDate.getDay() - 1 + 7) % 7; // Index of the last day filled
+            if (lastDayIndex !== 6) { // If the month didn't end on Saturday
                 let nextEmptyCell = lastDayIndex + 1;
                 for (let i = nextEmptyCell; i < 7; i++) {
                     const emptyEl = document.createElement('div');
@@ -1366,57 +1462,19 @@
                 }
             }
 
-            // renderUpcomingList(); // Already called in renderApp
+            renderUpcomingList();
             lucide.createIcons();
         };
 
-        // --- UPDATED: Show both upcoming and logged transactions in modal ---
-        const showDayEvents = (day, month, year, upcomingEvents, loggedTransactions) => {
-            const dateStr = new Date(year, month, day).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            let message = '';
-
-            // Section 1: Logged Transactions
-            if (loggedTransactions.length > 0) {
-                message += `<h5 class="font-bold text-lg mb-2 text-gray-800">Logged Transactions</h5><ul class="space-y-2 mb-4">`;
-                loggedTransactions.forEach(t => {
-                    const isExpense = t.type === 'Expense';
-                    const colorClass = isExpense ? 'peso-color-expense' : 'peso-color-income';
-                    const sign = isExpense ? '-' : '+';
-                    message += `
-                        <li class="border-b pb-2 last:border-b-0">
-                            <div class="flex justify-between">
-                                <span class="font-semibold text-gray-700">${t.particular}</span>
-                                <span class="${colorClass} font-bold">${sign}${formatCurrency(t.amount)}</span>
-                            </div>
-                            <span class="text-sm text-gray-500">${t.category}</span>
-                        </li>`;
-                });
-                message += `</ul>`;
-            }
-
-            // Section 2: Scheduled Items
-            if (upcomingEvents.length > 0) {
-                message += `<h5 class="font-bold text-lg mb-2 text-gray-800">Scheduled Items</h5><ul class="space-y-2">`;
-                upcomingEvents.forEach(e => {
-                    const recurringText = e.recurring ? ` (<span class="text-blue-600 font-medium">Monthly on Day ${e.recurringDay}</span>)` : '';
-                    message += `
-                        <li class="border-b pb-2 last:border-b-0">
-                            <div class="flex justify-between">
-                                <span class="font-semibold text-gray-700">${e.particular}</span>
-                                <span class="peso-color-debt font-bold">${formatCurrency(e.amount)}</span>
-                            </div>
-                            ${recurringText}
-                        </li>`;
-                });
-                message += `</ul>`;
-            }
-            
-            // Fallback if somehow clicked with no events
-            if (message === '') {
-                message = '<p class="text-gray-500">No financial events for this day.</p>';
-            }
-
-            showMessageModal(`Financial Events on ${dateStr}`, message);
+        const showDayEvents = (day, month, year, events) => {
+            const dateStr = new Date(year, month, day).toLocaleDateString();
+            let message = `<h5 class="font-bold text-lg mb-3">Upcoming for ${dateStr}:</h5><ul class="space-y-3">`;
+            events.forEach(e => {
+                const recurringText = e.recurring ? ` (<span class="text-blue-600">Monthly on Day ${e.recurringDay}</span>)` : '';
+                message += `<li class="border-b pb-2"><span class="font-semibold text-gray-800">${e.particular}:</span> <span class="peso-color-expense font-bold">${formatCurrency(e.amount)}</span> ${recurringText}</li>`;
+            });
+            message += `</ul>`;
+            showMessageModal(`Events on ${dateStr}`, message);
         };
 
         const renderUpcomingList = () => {
@@ -1430,14 +1488,14 @@
             }
 
             sortedUpcoming.forEach(item => {
-                const date = new Date(item.date.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const date = new Date(item.date.seconds * 1000).toLocaleDateString();
                 const recurringText = item.recurring ? ` (Recur Day ${item.recurringDay})` : ` (${date})`;
 
                 list.innerHTML += `
-                    <li class="flex justify-between items-center bg-gray-50 p-3 rounded-xl shadow-sm hover:bg-white transition-colors">
+                    <li class="flex justify-between items-center bg-gray-50 p-3 rounded-xl text-base shadow-sm hover:bg-white transition-colors">
                         <div>
                             <p class="font-bold text-gray-800">${item.particular}</p>
-                            <p class="text-gray-600 text-sm font-medium">${formatCurrency(item.amount)} <span class="text-xs text-blue-500 font-semibold">${recurringText}</span></p>
+                            <p class="text-gray-600 text-sm font-medium">${formatCurrency(item.amount)} <span class="text-xs text-blue-500">${recurringText}</span></p>
                         </div>
                         <button class="text-red-500 hover:text-red-700 text-xs delete-upcoming-btn p-1 rounded-full hover:bg-red-100 transition-colors"
                                 data-id="${item.id}">
@@ -1446,8 +1504,6 @@
                     </li>
                 `;
             });
-
-            lucide.createIcons(); // Ensure icons in list are rendered
 
             // Attach delete listeners
             document.querySelectorAll('.delete-upcoming-btn').forEach(btn => {
@@ -1487,8 +1543,8 @@
                 appState.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 // Default sort: Newest first
                 appState.transactions.sort((a, b) => b.date.seconds - a.date.seconds);
-                filterAndSortTransactions(); // Apply filters/sort on new data
-                renderApp(); // Full re-render
+                appState.filteredTransactions = appState.transactions; // Reset filtered list
+                renderApp();
             }, (error) => console.error("Transactions Listener Error: ", error));
 
             // 4. Upcoming Listener
@@ -1562,6 +1618,9 @@
 
 
         const setupEventListeners = () => {
+            // Set initial default date
+            document.getElementById('expense-date').value = getTodayDateString();
+
             // Auth Buttons
             document.getElementById('login-button').onclick = () => handleAuth(false);
             document.getElementById('signup-button').onclick = () => handleAuth(true);
@@ -1594,21 +1653,8 @@
             document.getElementById('expense-form').onsubmit = async (e) => {
                 e.preventDefault();
                 const form = e.target;
-                
-                // Get date from input
-                const dateInput = form['expense-date'].value;
-                if (!dateInput) {
-                     showMessageModal("Input Error", "Please select a valid date for the transaction.");
-                    return;
-                }
-                
-                // Create a Date object. Assumes local timezone, which is correct.
-                const localDate = new Date(dateInput); 
-                // Adjust for timezone offset to get correct UTC midnight for date
-                localDate.setMinutes(localDate.getMinutes() + localDate.getTimezoneOffset());
-                
                 const data = {
-                    date: localDate, // Use the adjusted Date object
+                    date: form['expense-date'].value || getTodayDateString(),
                     amount: parseFloat(form['expense-amount'].value),
                     type: form['expense-type'].value,
                     category: form['expense-category'].value,
@@ -1631,6 +1677,21 @@
             document.getElementById('filter-date-start').onchange = filterAndSortTransactions;
             document.getElementById('filter-date-end').onchange = filterAndSortTransactions;
             document.getElementById('sort-by').onchange = filterAndSortTransactions;
+
+            // Pagination
+            document.getElementById('prev-page').onclick = () => {
+                if (appState.currentPage > 1) {
+                    appState.currentPage--;
+                    renderTransactionsTable();
+                }
+            };
+            document.getElementById('next-page').onclick = () => {
+                const totalPages = Math.ceil(appState.transactions.length / transactionsPerPage);
+                if (appState.currentPage < totalPages) {
+                    appState.currentPage++;
+                    renderTransactionsTable();
+                }
+            };
 
             // Settings Form
             document.getElementById('partner-settings-form').onsubmit = async (e) => {
@@ -1676,8 +1737,32 @@
             };
 
             // Report Buttons
-            document.getElementById('generate-report-button').onclick = generateReport;
+            document.getElementById('generate-report-button').onclick = () => generateReport(true);
             document.getElementById('print-report-button').onclick = () => window.print();
+            document.getElementById('download-csv-button').onclick = () => {
+                const transactions = appState.reportTransactions.length > 0 ? appState.reportTransactions : appState.transactions;
+                downloadCSV(transactions);
+            };
+
+            // Report Pagination
+            document.getElementById('report-prev-page').onclick = () => {
+                if (appState.reportCurrentPage > 1) {
+                    appState.reportCurrentPage--;
+                    generateReport();
+                }
+            };
+            document.getElementById('report-next-page').onclick = () => {
+                const totalPages = Math.ceil(appState.reportTransactions.length / transactionsPerPage);
+                if (appState.reportCurrentPage < totalPages) {
+                    appState.reportCurrentPage++;
+                    generateReport();
+                }
+            };
+
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-button').onclick = () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            };
 
             // Calendar Navigation
             document.getElementById('calendar-prev').onclick = () => {
@@ -1704,30 +1789,16 @@
             document.getElementById('upcoming-form').onsubmit = async (e) => {
                 e.preventDefault();
                 const form = e.target;
-                
-                const dateInput = form['upcoming-date'].value;
-                if (!dateInput) {
-                     showMessageModal("Input Error", "Please select a valid date for the scheduled item.");
-                    return;
-                }
-                
-                // Adjust for timezone offset
-                const localDate = new Date(dateInput); 
-                localDate.setMinutes(localDate.getMinutes() + localDate.getTimezoneOffset());
-                
                 const isRecurring = form['upcoming-recurring'].checked;
                 const data = {
                     particular: form['upcoming-particular'].value,
                     amount: parseFloat(form['upcoming-amount'].value),
-                    date: localDate, // Use adjusted Date object
+                    date: form['upcoming-date'].value,
                     recurring: isRecurring,
                     recurringDay: isRecurring ? parseInt(form['recurring-day'].value) : null
                 };
                 await addUpcomingExpense(data);
             };
-            
-            // Set default date for expense form
-            document.getElementById('expense-date').valueAsDate = new Date();
         };
 
         // --- INITIALIZATION ---
