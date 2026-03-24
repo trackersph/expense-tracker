@@ -241,7 +241,7 @@
                                 </select>
                             </div>
 
-                            <div>
+                            <div id="debt-handling-container">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Debt Handling</label>
                                 <select id="expense-debt-type" class="ios-select w-full" required>
                                     <option value="Shared">Shared Expense (Split)</option>
@@ -722,34 +722,39 @@
 
                 const isPartnerA = data.whoPaid === appState.settings.partnerA;
                 const balanceKey = isPartnerA ? 'incomeA' : 'incomeB';
+                const updates = {};
 
-                // 1. Update total debt if it was a shared expense or debt payment
-                if ((data.debtType === "Shared" && data.type === "Expense") || data.debtType === "DebtPayment") {
-                    const adjustment = calculateDebtAdjustment(data.amount, data.whoPaid, data.debtType);
-                    // Use Number.parseFloat and toFixed to avoid floating point precision issues
-                    const newDebt = parseFloat((appState.settings.currentDebt + adjustment).toFixed(2));
-                    await updateDoc(doc(db, getSettingsPath()), {
-                        currentDebt: newDebt
-                    });
+                // Determine updates based on transaction type
+                if (data.debtType === "DebtPayment") {
+                    // Two-way transfer for Debt Payment
+                    const [partnerA, partnerB] = getPartnerNames();
+                    const receivingPartner = data.whoPaid === partnerA ? partnerB : partnerA;
+                    const receivingBalanceKey = receivingPartner === partnerA ? 'incomeA' : 'incomeB';
+                    updates[balanceKey] = parseFloat((appState.settings[balanceKey] - data.amount).toFixed(2));
+                    updates[receivingBalanceKey] = parseFloat((appState.settings[receivingBalanceKey] + data.amount).toFixed(2));
+                } else {
+                    // Standard income or expense updates
+                    if (data.type === "Income") {
+                        updates[balanceKey] = parseFloat((appState.settings[balanceKey] + data.amount).toFixed(2));
+                    } else { // Expense (Shared or Personal)
+                        updates[balanceKey] = parseFloat((appState.settings[balanceKey] - data.amount).toFixed(2));
+                    }
+
+                    // Update shared debt only for Shared Expenses
+                    if (data.debtType === "Shared" && data.type === "Expense") {
+                        const adjustment = calculateDebtAdjustment(data.amount, data.whoPaid, data.debtType);
+                        updates.currentDebt = parseFloat((appState.settings.currentDebt + adjustment).toFixed(2));
+                    }
                 }
 
-                // 2. Dynamic Income/Balance Logic
-                if (data.type === "Expense") {
-                    // Deduct from partner balance for ALL expense types (Regardless if it is personal, debt, or shared)
-                    const newBalance = parseFloat((appState.settings[balanceKey] - data.amount).toFixed(2));
-                    await updateDoc(doc(db, getSettingsPath()), {
-                        [balanceKey]: newBalance
-                    });
-                } else if (data.type === "Income") {
-                    // Add to partner balance for income
-                    const newBalance = parseFloat((appState.settings[balanceKey] + data.amount).toFixed(2));
-                    await updateDoc(doc(db, getSettingsPath()), {
-                        [balanceKey]: newBalance
-                    });
+                // Apply all updates in a single operation
+                if (Object.keys(updates).length > 0) {
+                    await updateDoc(doc(db, getSettingsPath()), updates);
                 }
 
                 document.getElementById('expense-form').reset();
                 document.getElementById('expense-date').value = getTodayDateString();
+                updateFormForTransactionType(); // Reset form to default state
             } catch (e) {
                 console.error("Error adding transaction: ", e);
                 showMessageModal("Error", "Failed to add transaction.");
@@ -763,30 +768,34 @@
 
                 const isPartnerA = whoPaid === appState.settings.partnerA;
                 const balanceKey = isPartnerA ? 'incomeA' : 'incomeB';
+                const updates = {};
 
-                // 1. Recalculate debt only if it was a shared expense or debt payment
-                if ((debtType === "Shared" && type === "Expense") || debtType === "DebtPayment") {
-                    const adjustment = calculateDebtAdjustment(amount, whoPaid, debtType);
-                    // Deleting the transaction reverses the debt adjustment
-                    const newDebt = parseFloat((appState.settings.currentDebt - adjustment).toFixed(2));
-                    await updateDoc(doc(db, getSettingsPath()), {
-                        currentDebt: newDebt
-                    });
+                // Determine reversal updates based on transaction type
+                if (debtType === "DebtPayment") {
+                    // Reverse the two-way transfer
+                    const [partnerA, partnerB] = getPartnerNames();
+                    const receivingPartner = whoPaid === partnerA ? partnerB : partnerA;
+                    const receivingBalanceKey = receivingPartner === partnerA ? 'incomeA' : 'incomeB';
+                    updates[balanceKey] = parseFloat((appState.settings[balanceKey] + amount).toFixed(2));
+                    updates[receivingBalanceKey] = parseFloat((appState.settings[receivingBalanceKey] - amount).toFixed(2));
+                } else {
+                    // Standard income or expense reversals
+                    if (type === "Income") {
+                        updates[balanceKey] = parseFloat((appState.settings[balanceKey] - amount).toFixed(2));
+                    } else { // Expense (Shared or Personal)
+                        updates[balanceKey] = parseFloat((appState.settings[balanceKey] + amount).toFixed(2));
+                    }
+
+                    // Reverse shared debt only for Shared Expenses
+                    if (debtType === "Shared" && type === "Expense") {
+                        const adjustment = calculateDebtAdjustment(amount, whoPaid, debtType);
+                        updates.currentDebt = parseFloat((appState.settings.currentDebt - adjustment).toFixed(2));
+                    }
                 }
 
-                // 2. Reverse Dynamic Balance Logic
-                if (type === "Expense") {
-                    // Restore partner balance for ALL expense types
-                    const newBalance = parseFloat((appState.settings[balanceKey] + amount).toFixed(2));
-                    await updateDoc(doc(db, getSettingsPath()), {
-                        [balanceKey]: newBalance
-                    });
-                } else if (type === "Income") {
-                    // Deduct from partner balance for deleted income
-                    const newBalance = parseFloat((appState.settings[balanceKey] - amount).toFixed(2));
-                    await updateDoc(doc(db, getSettingsPath()), {
-                        [balanceKey]: newBalance
-                    });
+                // Apply all updates in a single operation
+                if (Object.keys(updates).length > 0) {
+                    await updateDoc(doc(db, getSettingsPath()), updates);
                 }
             } catch (e) {
                 console.error("Error deleting transaction: ", e);
@@ -870,6 +879,29 @@
             document.getElementById('main-app').classList.toggle('hidden', show);
         };
 
+        const updateFormForTransactionType = () => {
+            const type = document.getElementById('expense-type').value;
+            const isIncome = type === 'Income';
+
+            // Update Category dropdown
+            const categorySelect = document.getElementById('expense-category');
+            const categories = isIncome ? appState.accounts.income : appState.accounts.expense;
+            categorySelect.innerHTML = `<option value="" disabled selected>Select Category</option>` + 
+                                     categories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+            // Update Account dropdown
+            const accountSelect = document.getElementById('expense-account');
+            const accounts = isIncome ? appState.accounts.asset : [...appState.accounts.asset, ...appState.accounts.liability];
+            accountSelect.innerHTML = `<option value="" disabled selected>Select Account</option>` + 
+                                    accounts.map(a => `<option value="${a}">${a}</option>`).join('');
+
+            // Update Who Paid / Received label
+            document.querySelector('label[for="expense-who-paid"]').textContent = isIncome ? 'Received By' : 'Who Paid / Received';
+
+            // Show/Hide Debt Handling
+            document.getElementById('debt-handling-container').classList.toggle('hidden', isIncome);
+        };
+
         const renderApp = () => {
             // 1. Update Partner Names in Tracker/Forms
             const [partnerA, partnerB] = getPartnerNames();
@@ -881,27 +913,11 @@
                                        <option value="${partnerB}">${partnerB}</option>`;
             whoPaidSelect.value = currentPaid || "";
 
-            // 2. Update Custom Selects
-            const expenseCategorySelect = document.getElementById('expense-category');
-            const currentCat = expenseCategorySelect.value;
-            const categories = [...appState.accounts.expense, ...appState.accounts.income];
-            expenseCategorySelect.innerHTML = `<option value="" disabled selected>Select Category</option>` +
-                                              categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            expenseCategorySelect.value = currentCat || "";
-
-            const expenseAccountSelect = document.getElementById('expense-account');
-            const currentAcc = expenseAccountSelect.value;
-            const accounts = [...appState.accounts.asset, ...appState.accounts.liability];
-            expenseAccountSelect.innerHTML = `<option value="" disabled selected>Select Account</option>` +
-                                              accounts.map(a => `<option value="${a}">${a}</option>`).join('');
-            expenseAccountSelect.value = currentAcc || "";
-
-
-            // 3. Render Tracker Section
+            // 2. Render Tracker Section
             renderTrackerSummary();
             renderTransactionsTable();
 
-            // 4. Render Settings
+            // 3. Render Settings
             renderSettings();
 
             // 5. Render Calendar (if in view)
@@ -911,6 +927,9 @@
 
             // 6. Update User Info
             document.getElementById('user-info').textContent = `User ID: ${userId.slice(0, 8)}...`; // Show truncated ID
+
+            // 7. Set initial form state
+            updateFormForTransactionType();
 
             // Re-render lucide icons
             lucide.createIcons();
@@ -1661,7 +1680,7 @@
                     category: form['expense-category'].value,
                     particular: form['expense-particular'].value,
                     whoPaid: form['expense-who-paid'].value,
-                    debtType: form['expense-debt-type'].value,
+                    debtType: form['expense-debt-type'].value || 'N/A',
                     account: form['expense-account'].value,
                 };
                 
@@ -1672,6 +1691,9 @@
 
                 await addTransaction(data);
             };
+
+            // Dynamic form logic
+            document.getElementById('expense-type').addEventListener('change', updateFormForTransactionType);
 
             // Transaction Filter/Sort
             document.getElementById('filter-particular').oninput = filterAndSortTransactions;
@@ -1807,6 +1829,7 @@
         // Run setup functions
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
+            updateFormForTransactionType(); // Set initial form state
             lucide.createIcons();
             // Start the mandatory initial authentication flow
             initializeAuthAndApp(); 
